@@ -3,18 +3,70 @@
     require_once "index.php";
 
 
-    function calc ($ip, $mask){
+    function calc ($ipInformado, $mask){
 
 
         $enderecos = pow(2,(32-$mask));
         $subredes = 256 / $enderecos;
         $hosts = $subredes - 2;
-        $ip = array explode("." , "$ip");
+        $ip = explode("." , "$ipInformado");
 
-        
+        $a = $ip[3] / $enderecos;
+        $firstHost = floor($a) * $enderecos + 1;
+        $lastHost = $firstHost + ($enderecos - 3);
+        $broadcast = $lastHost + 1;
+        $maskDecimal = 256 - $enderecos;
+
+        switch ($ipInformado){
+            case $ipInformado >= 0 AND $ipInformado <= 127:
+                $classe =  "classe A";
+                break;
+
+            case $ipInformado >= 128 AND $ipInformado <= 191:
+                $classe = "classe B";
+                break;
+
+            case $ipInformado >=192 AND $ipInformado <= 223:
+                $classe = "classe C";
+                break;
+
+            case $ipInformado >= 240 AND $ipInformado <= 255:
+                $classe = "classe D";
+                break;
+        }
+
+        switch ($ipInformado){
+            case $ipInformado >= 10 AND $ipInformado <= 10.255:
+                $classeIp =  "privado";
+                break;
+
+            case $ipInformado >= 172.16 AND $ipInformado <= 172.31:
+                $classeIp = "privado";
+                break;
+
+            case $ipInformado >=192.168 AND $ipInformado <= 172.169:
+                $classeIp = "privado";
+                break;
+
+            default:
+                $classeIp = "publico";
+                break;
+        }
 
 
-        echo "O IP contém $enderecos endereços, $subredes subredes, cada subrede contém $hosts endereços de hosts";
+        $ar = ['enderecos' => $enderecos,
+            'subredes' => $subredes,
+            'hosts' => $hosts,
+            'primeiro endereco de host' => "$ip[0].$ip[1].$ip[2].$firstHost",
+            'ultimo endereco de host' => "$ip[0].$ip[1].$ip[2].$lastHost",
+            'broadcast' => "$ip[0].$ip[1].$ip[2].$broadcast",
+            'mascara de rede' => "255.255.255.$maskDecimal",
+            'classe do ip' => "$classe, $classeIp"
+        ];
+
+
+
+        print_r($ar);
 
 //        if ($mask == 24) {
 //            echo "O IP contém 1 subrede\n";
@@ -62,6 +114,8 @@
 //        }
     }
 
-    $ip = $_POST['ip'];
-    $mask = $_POST['mask'];
-    $calculo = calc($mask);
+//    $ip = $_POST['ip'];
+//    $mask = $_POST['mask'];
+    $ip = '192.168.10.156';
+    $mask = '27';
+    $calculo = calc($ip, $mask);
